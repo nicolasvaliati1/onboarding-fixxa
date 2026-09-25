@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Briefing de Onboarding | FIXXA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/css/intlTelInput.min.css">
+<script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/intlTelInputWithUtils.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta name="theme-color" content="#0A0A0A">
+<style>
+  :root {
+    --yellow: #F0D100;
+    --yellow-soft: rgba(240, 209, 0, 0.12);
+    --black: #0A0A0A;
+    --surface: #141414;
+    --surface-2: #1B1B1B;
+    --border: #2A2A2A;
+    --border-strong: #3A3A3A;
+    --text: #F5F5F5;
+    --muted: #9A9A9A;
+    --danger: #FF5A5A;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1, h2, h3, .display { font-family: 'Montserrat', sans-serif; letter-spacing: -0.01em; }
+
+  /* Progress bar */
+  .progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: transparent; z-index: 50;
+  }
+  .progress span {
+    display: block; height: 100%; width: 0;
+    background: var(--yellow);
+    transition: width .4s ease;
+  }
+
+  /* Header */
+  header.top {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(10,10,10,.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .top-inner {
+    max-width: 1120px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .top-inner img { height: 22px; width: auto; display: block; }
+  .top-status { font-size: 13px; color: var(--muted); }
+  .top-status b { color: var(--yellow); font-weight: 600; }
+
+  /* Layout */
+  .layout {
+    max-width: 1120px; margin: 0 auto; padding: 0 24px 120px;
+    display: grid; grid-template-columns: 240px 1fr; gap: 56px;
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; padding: 0 16px 96px; }
+    aside.nav { display: none; }
+  }
+
+  /* Hero */
+  .content { min-width: 0; }
+  .hero { padding: 88px 0 56px; }
+  @media (max-width: 900px) { .hero { padding: 56px 0 40px; } }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em;
+    color: var(--yellow); margin-bottom: 20px;
+  }
+  .eyebrow::before { content: ""; width: 24px; height: 2px; background: var(--yellow); }
+  .hero h1 {
+    font-size: clamp(36px, 5vw, 56px); font-weight: 800; line-height: 1.05;
+  }
+  .hero h1 em { font-style: normal; color: var(--yellow); }
+  .hero-copy {
+    margin-top: 28px; max-width: 680px; color: var(--muted);
+    display: grid; gap: 14px; font-size: 17px;
+  }
+  .hero-copy strong { color: var(--text); font-weight: 600; }
+
+  /* Side nav */
+  aside.nav { position: relative; padding-top: 95px; }
+  .nav-inner { position: sticky; top: 104px; }
+  .nav-inner p { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 16px; }
+  .nav-inner ol { list-style: none; display: grid; gap: 4px; }
+  .nav-inner a {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px;
+    color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500;
+    transition: background .2s, color .2s;
+  }
+  .nav-inner a:hover { background: var(--surface); color: var(--text); }
+  .nav-inner a.active { background: var(--surface); color: var(--text); }
+  .nav-num {
+    flex: none; width: 26px; height: 26px; border-radius: 50%;
+    display: grid; place-items: center;
+    border: 1px solid var(--border-strong); font-size: 12px; font-weight: 600;
+    font-family: 'Montserrat', sans-serif;
+    transition: all .2s;
+  }
+  .nav-inner a.active .nav-num { border-color: var(--yellow); color: var(--yellow); }
+  .nav-inner a.done .nav-num { background: var(--yellow); border-color: var(--yellow); color: var(--black); }
+
+  /* Sections */
+  form { display: grid; gap: 32px; }
+  section.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    scroll-margin-top: 96px;
+    opacity: 0; transform: translateY(16px);
+    transition: opacity .6s ease, transform .6s ease;
+  }
+  section.card.visible { opacity: 1; transform: none; }
+  @media (max-width: 640px) { section.card { padding: 28px 20px; border-radius: 16px; } }
+  .card-head { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+  .card-head .step { font-family: 'Montserrat', sans-serif; font-size: 13px; font-weight: 700; color: var(--yellow); letter-spacing: .08em; }
+  .card-head h2 { font-size: 26px; font-weight: 700; margin-top: 6px; }
+  .card-head p { color: var(--muted); margin-top: 6px; font-size: 15px; }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 24px; }
+  .field.full { grid-column: 1 / -1; }
+  /* Side-by-side fields: labels on top, inputs aligned on the same line even when one label wraps */
+  .field { display: flex; flex-direction: column; }
+  .field > input, .field > textarea, .field > .money, .field > .iti, .field > .drop { margin-top: auto; }
+  @media (max-width: 640px) { .fields { grid-template-columns: 1fr; } }
+
+  .field label.q, .field .q {
+    display: block; font-size: 15px; font-weight: 500; margin-bottom: 8px; color: var(--text);
+  }
+  .req { color: var(--yellow); margin-left: 3px; }
+  /* Filling guidance shown under the question */
+  .tip {
+    display: flex; align-items: flex-start; gap: 6px;
+    margin-top: 5px;
+    font-size: 13px; font-weight: 400; line-height: 1.45;
+    color: rgba(240, 209, 0, 0.78);
+  }
+  .tip svg { flex: none; width: 13px; height: 13px; margin-top: 2px; }
+  .hint { display: block; font-size: 13px; color: var(--muted); margin: -4px 0 10px; }
+
+  input[type=text], input[type=tel], input[type=email], input[type=number], input[type=date], textarea {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px;
+    color: var(--text);
+    font: inherit; font-size: 15px;
+    transition: border-color .2s, box-shadow .2s, background .2s;
+    outline: none;
+  }
+  input::placeholder, textarea::placeholder { color: #5E5E5E; }
+  input:hover, textarea:hover { border-color: var(--border-strong); }
+  input:focus, textarea:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 3px var(--yellow-soft);
+    background: #1F1F1F;
+  }
+  input[type=date] { color-scheme: dark; }
+  input[type=number]::-webkit-inner-spin-button { opacity: .4; }
+  textarea { min-height: 112px; resize: vertical; line-height: 1.55; }
+
+  .money { position: relative; }
+  .money span {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--muted); font-size: 15px; pointer-events: none;
+  }
+  .money input { padding-left: 28px; }
+
+  /* Phone country picker */
+  .iti {
+    width: 100%;
+    --iti-border-color: var(--border);
+    --iti-dropdown-bg: var(--surface-2);
+    --iti-hover-color: rgba(255,255,255,.06);
+    --iti-dialcode-color: var(--muted);
+    --iti-arrow-color: var(--muted);
+  }
+  .iti__selected-country { border-radius: 10px 0 0 10px; }
+  .iti__selected-country-primary { padding: 0 8px 0 14px; }
+  .iti__selected-country:hover .iti__selected-country-primary,
+  .iti__selected-country:focus-visible .iti__selected-country-primary { background: rgba(255,255,255,.04); }
+  .iti--separate-dial-code .iti__selected-dial-code { color: var(--text); font-size: 15px; }
+  .iti__dropdown-content {
+    border: 1px solid var(--border-strong); border-radius: 10px; overflow: hidden;
+    box-shadow: 0 16px 40px rgba(0,0,0,.5); color: var(--text); margin-top: 6px;
+  }
+  .iti__search-input {
+    background: var(--surface); color: var(--text); border: 0;
+    border-bottom: 1px solid var(--border); padding: 12px 14px; font: inherit; font-size: 14px; outline: none;
+  }
+  .iti__search-input::placeholder { color: #5E5E5E; }
+  .iti__country { font-size: 14px; padding: 9px 14px; }
+  .iti__country.iti__highlight { background: var(--yellow-soft); }
+  .iti--fullscreen-popup.iti--container { background: rgba(0,0,0,.7); }
+
+  /* Choice pills */
+  .choices { display: flex; flex-wrap: wrap; gap: 10px; }
+  .choices label {
+    position: relative; cursor: pointer;
+  }
+  .choices input { position: absolute; opacity: 0; pointer-events: none; }
+  .choices span {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 18px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    font-size: 14px; font-weight: 500; color: var(--muted);
+    transition: all .2s;
+  }
+  .choices span::before {
+    content: ""; width: 14px; height: 14px; border-radius: 50%;
+    border: 1.5px solid var(--border-strong); transition: all .2s;
+  }
+  .choices label:hover span { border-color: var(--border-strong); color: var(--text); }
+  .choices input:checked + span {
+    border-color: var(--yellow); color: var(--text); background: var(--yellow-soft);
+  }
+  .choices input:checked + span::before {
+    border-color: var(--yellow); background: var(--yellow);
+    box-shadow: inset 0 0 0 3px var(--surface-2);
+  }
+  .choices input:focus-visible + span { box-shadow: 0 0 0 3px var(--yellow-soft); }
+
+  .note {
+    display: flex; gap: 10px; align-items: flex-start;
+    font-size: 13px; color: var(--muted);
+    background: var(--surface-2); border-left: 2px solid var(--yellow);
+    padding: 10px 14px; border-radius: 0 8px 8px 0; margin: 0 0 12px;
+  }
+
+  /* Dropzone */
+  .drop {
+    position: relative;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    text-align: center; padding: 26px 16px; min-height: 132px;
+    border: 1.5px dashed var(--border-strong); border-radius: 12px;
+    background: var(--surface-2); cursor: pointer;
+    transition: border-color .2s, background .2s;
+  }
+  .drop:hover, .drop.over { border-color: var(--yellow); background: #1E1D14; }
+  .drop input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+  .drop svg { width: 26px; height: 26px; color: var(--yellow); }
+  .drop strong { font-size: 14px; font-weight: 600; }
+  .drop small { font-size: 12px; color: var(--muted); }
+  .file-list { list-style: none; margin-top: 10px; display: grid; gap: 6px; }
+  .file-list li {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 13px; background: var(--surface-2); border: 1px solid var(--border);
+    padding: 8px 12px; border-radius: 8px;
+  }
+  .file-list li span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-list button {
+    background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 18px; line-height: 1;
+  }
+  .file-list button:hover { color: var(--danger); }
+
+  /* Errors */
+  .field.error input, .field.error textarea { border-color: var(--danger); }
+  .field.error .choices span { border-color: rgba(255,90,90,.5); }
+  .field { position: relative; }
+  .err-msg { display: none; position: absolute; top: 100%; left: 0; font-size: 13px; line-height: 1.4; color: var(--danger); margin-top: 5px; }
+  .field.error .err-msg { display: block; }
+
+  /* Submit */
+  .submit-bar {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+    padding: 28px 0 0;
+  }
+  .submit-bar p { font-size: 14px; color: var(--muted); }
+  .saved { display: inline-flex; align-items: center; gap: 8px; }
+  .saved i { width: 7px; height: 7px; border-radius: 50%; background: #3DDC84; display: inline-block; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    background: var(--yellow); color: var(--black);
+    font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: .02em;
+    padding: 16px 32px; border-radius: 999px; border: 0; cursor: pointer;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(240,209,0,.22); }
+  .btn:active { transform: none; }
+  .btn svg { width: 18px; height: 18px; transition: transform .2s; }
+  .btn:hover svg { transform: translateX(3px); }
+  .btn[disabled] { opacity: .7; cursor: wait; transform: none; box-shadow: none; }
+  .btn .spinner {
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 2px solid rgba(10,10,10,.25); border-top-color: var(--black);
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .send-error {
+    margin-top: 16px; padding: 12px 16px; border-radius: 10px;
+    background: rgba(255,90,90,.08); border: 1px solid rgba(255,90,90,.35);
+    color: #FF8A8A; font-size: 14px;
+  }
+
+  /* Success */
+  .success {
+    display: none;
+    max-width: 720px; margin: 0 auto; padding: 120px 24px; text-align: center;
+  }
+  .success.show { display: block; animation: rise .7s ease both; }
+  .check {
+    width: 72px; height: 72px; margin: 0 auto 32px; border-radius: 50%;
+    background: var(--yellow); display: grid; place-items: center;
+  }
+  .check svg { width: 32px; height: 32px; color: var(--black); }
+  .success h2 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; line-height: 1.1; }
+  .success p { color: var(--muted); margin-top: 18px; font-size: 17px; }
+  .success .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 40px; }
+
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 32px 24px; text-align: center; color: var(--muted); font-size: 13px;
+  }
+  footer img { height: 16px; width: auto; opacity: .7; margin-bottom: 10px; }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
+  .hero > * { animation: rise .8s ease both; }
+  .hero > *:nth-child(2) { animation-delay: .08s; }
+  .hero > *:nth-child(3) { animation-delay: .16s; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+    section.card { opacity: 1; transform: none; }
+  }
+
+  @media print {
+    body { background: #fff; color: #000; }
+    header.top, aside.nav, .progress, .submit-bar, footer, .success { display: none !important; }
+    .layout { display: block; }
+    section.card { opacity: 1; transform: none; border-color: #ccc; background: #fff; break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<div class="progress" aria-hidden="true"><span id="progressBar"></span></div>
+
+<header class="top">
+  <div class="top-inner">
+    <img src="assets/logo-light.png" alt="FIXXA Marketing" width="2702" height="498">
+    <div class="top-status"><b id="progressPct">0%</b> preenchido</div>
+  </div>
+</header>
+
+<main id="formView">
+  <div class="layout">
+    <aside class="nav" aria-label="Seções do formulário">
+      <div class="nav-inner">
+        <p>Seções</p>
+        <ol>
+          <li><a href="#s1" data-sec="s1"><span class="nav-num">1</span>Informações pessoais</a></li>
+          <li><a href="#s2" data-sec="s2"><span class="nav-num">2</span>Informações da empresa</a></li>
+          <li><a href="#s3" data-sec="s3"><span class="nav-num">3</span>Público alvo</a></li>
+          <li><a href="#s4" data-sec="s4"><span class="nav-num">4</span>Anúncios</a></li>
+        </ol>
+      </div>
+    </aside>
+
+    <div class="content">
+      <div class="hero">
+        <div class="eyebrow">Briefing de Onboarding</div>
+        <h1>Bem-vindo(a) à <em>FIXXA</em> Marketing</h1>
+        <div class="hero-copy">
+          <p>Para que possamos compreender plenamente suas necessidades e expectativas, solicitamos que preencha este formulário de briefing. Suas respostas nos ajudarão a criar soluções personalizadas que se alinhem perfeitamente aos objetivos do seu projeto.</p>
+          <p>Por favor, forneça o <strong>máximo de detalhes possível</strong> em cada seção. Isso nos permitirá desenvolver estratégias eficazes e garantir que o resultado final atenda, ou até mesmo supere, suas expectativas.</p>
+          <p>Se tiver alguma dúvida ou precisar de assistência ao preencher o formulário, não hesite em nos contatar. Estamos ansiosos para trabalhar com você.</p>
+        </div>
+      </div>
+
+    <form id="briefing" novalidate>
+
+      <!-- 1. Informações pessoais -->
+      <section class="card" id="s1">
+        <div class="card-head">
+          <div class="step">01</div>
+          <h2>Informações pessoais</h2>
+          <p>Compartilhe informações sobre você.</p>
+        </div>
+        <div class="fields">
+          <div class="field" data-required>
+            <label class="q" for="nome">Nome Completo<span class="req">*</span></label>
+            <input type="text" id="nome" name="Nome Completo" placeholder="Inserir texto" autocomplete="name">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="tel_pessoal">Telefone pessoal<span class="req">*</span></label>
+            <input type="tel" id="tel_pessoal" name="Telefone pessoal" placeholder="Inserir telefone" autocomplete="tel">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="nascimento">Data de Nascimento<span class="req">*</span></label>
+            <input type="text" id="nascimento" name="Data de Nascimento" placeholder="Inserir texto">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <span class="q">Nível de Inglês<span class="req">*</span></span>
+            <div class="choices" role="radiogroup">
+              <label><input type="radio" name="Nível de Inglês" value="Fluente"><span>Fluente</span></label>
+              <label><input type="radio" name="Nível de Inglês" value="Avançado"><span>Avançado</span></label>
+              <label><input type="radio" name="Nível de Inglês" value="Intermediário"><span>Intermediário</span></label>
+              <label><input type="radio" name="Nível de Inglês" value="Básico"><span>Básico</span></label>
+            </div>
+            <div class="err-msg">Selecione uma opção.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. Informações da empresa -->
+      <section class="card" id="s2">
+        <div class="card-head">
+          <div class="step">02</div>
+          <h2>Informações da empresa</h2>
+          <p>Compartilhe informações sobre a sua empresa.</p>
+        </div>
+        <div class="fields">
+          <div class="field full" data-required>
+            <label class="q" for="razao">Nome oficial da empresa<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Conforme registrado no IRS</span></label>
+            <input type="text" id="razao" name="Nome oficial da empresa (conforme registrado no IRS)" placeholder="Inserir texto" autocomplete="organization">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="ein">Qual o EIN da empresa?<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Employer Identification Number</span></label>
+            <input type="text" id="ein" name="EIN (Employer Identification Number)" placeholder="Inserir texto">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="fundacao">Em qual ano a empresa foi fundada?<span class="req">*</span></label>
+            <input type="number" id="fundacao" name="Ano de fundação" placeholder="Inserir número" min="1900" max="2100">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full">
+            <span class="q">Faça o upload do logo da sua empresa</span>
+            <div class="drop" data-drop>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <strong>Solte seus arquivos aqui</strong>
+              <small>ou clique para selecionar</small>
+              <input type="file" name="Logo da empresa" multiple>
+            </div>
+            <ul class="file-list"></ul>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="endereco">Endereço da empresa<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Cidade, Estado, ZIP Code</span></label>
+            <textarea id="endereco" name="Endereço da empresa (Cidade, Estado, ZIP Code)" placeholder="Inserir texto" rows="3"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="tel_empresa">Telefone da empresa<span class="req">*</span></label>
+            <input type="tel" id="tel_empresa" name="Telefone da empresa" placeholder="Inserir telefone">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="email_empresa">E-mail da empresa<span class="req">*</span></label>
+            <input type="email" id="email_empresa" name="E-mail da empresa" placeholder="Inserir e-mail" autocomplete="email">
+            <div class="err-msg">Insira um e-mail válido.</div>
+          </div>
+          <div class="field">
+            <span class="q">Faça o upload da Contractor License<span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Se houver</span></span>
+            <div class="drop" data-drop>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <strong>Solte seus arquivos aqui</strong>
+              <small>ou clique para selecionar</small>
+              <input type="file" name="Contractor License" multiple>
+            </div>
+            <ul class="file-list"></ul>
+          </div>
+          <div class="field">
+            <span class="q">Faça o upload do insurance<span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Se houver</span></span>
+            <div class="drop" data-drop>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg>
+              <strong>Solte seus arquivos aqui</strong>
+              <small>ou clique para selecionar</small>
+              <input type="file" name="Insurance" multiple>
+            </div>
+            <ul class="file-list"></ul>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="horarios">Dias e horários disponíveis para estimates<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Iremos usar isso como base para agendar os clientes</span></label>
+            <textarea id="horarios" name="Dias e horários disponíveis para estimates" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="servicos">Descreva seus serviços em ordem de importância<span class="req">*</span></label>
+            <textarea id="servicos" name="Serviços em ordem de importância" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="foco">Em qual desses serviços você quer focar inicialmente?<span class="req">*</span></label>
+            <input type="text" id="foco" name="Serviço para focar inicialmente" placeholder="Inserir texto">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="valor_medio">Qual o valor médio de cada serviço?<span class="req">*</span></label>
+            <span class="hint">Ex.: Flooring installation $2,500, interior painting $2,000</span>
+            <textarea id="valor_medio" name="Valor médio de cada serviço" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="regioes">Quais regiões você deseja atingir?<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Seja específico: ZIPs, Counties, etc.</span></label>
+            <textarea id="regioes" name="Regiões que deseja atingir" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="equipe">Quantas pessoas tem na equipe?<span class="req">*</span></label>
+            <input type="number" id="equipe" name="Pessoas na equipe" placeholder="Inserir número" min="0">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="faturamento">Qual o faturamento atual da companhia?<span class="req">*</span><span class="tip"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 7.2v3.8"/><circle cx="8" cy="4.9" r=".4" fill="currentColor"/></svg>Média mensal</span></label>
+            <div class="money"><span>$</span><input type="text" inputmode="numeric" id="faturamento" name="Faturamento médio mensal" placeholder="Inserir moeda"></div>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="concorrentes">Quem são seus principais concorrentes na região? Seja específico, informe o nome da empresa<span class="req">*</span></label>
+            <textarea id="concorrentes" name="Principais concorrentes na região" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <span class="q">Você oferece opções de financiamento?<span class="req">*</span></span>
+            <div class="choices" role="radiogroup">
+              <label><input type="radio" name="Oferece opções de financiamento?" value="Sim"><span>Sim</span></label>
+              <label><input type="radio" name="Oferece opções de financiamento?" value="Não"><span>Não</span></label>
+            </div>
+            <div class="err-msg">Selecione uma opção.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="garantias">Quais são as garantias que você fornece? Materiais, serviço, etc.<span class="req">*</span></label>
+            <textarea id="garantias" name="Garantias fornecidas" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="promocoes">Quais são as principais ações promocionais que você pode ofertar?<span class="req">*</span></label>
+            <span class="hint">Ex.: 40% OFF New Countertops, $500 OFF Flooring Installation, $3,000 OFF Full Kitchen Renovation, etc.</span>
+            <textarea id="promocoes" name="Ações promocionais" placeholder="Inserir texto"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. Público Alvo -->
+      <section class="card" id="s3">
+        <div class="card-head">
+          <div class="step">03</div>
+          <h2>Público alvo</h2>
+          <p>Compartilhe informações sobre o público alvo da sua empresa.</p>
+          <div class="err-msg">Preencha este campo.</div>
+        </div>
+        <div class="fields">
+          <div class="field" data-required>
+            <label class="q" for="faixa">Faixa etária do público alvo<span class="req">*</span></label>
+            <input type="text" id="faixa" name="Faixa etária do público alvo" placeholder="Inserir texto">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field" data-required>
+            <label class="q" for="classe">Classe social do público alvo<span class="req">*</span></label>
+            <input type="text" id="classe" name="Classe social do público alvo" placeholder="Inserir texto">
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <span class="q">Gênero do público alvo<span class="req">*</span></span>
+            <div class="choices" role="radiogroup">
+              <label><input type="radio" name="Gênero do público alvo" value="Masculino"><span>Masculino</span></label>
+              <label><input type="radio" name="Gênero do público alvo" value="Feminino"><span>Feminino</span></label>
+            </div>
+            <div class="err-msg">Selecione uma opção.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="detalhes">Detalhes específicos<span class="req">*</span></label>
+            <span class="hint">Conte mais detalhes que você sabe sobre o seu público alvo. Ex.: Tem cachorro? A maioria trabalha home office? Aposentados? Tem filhos?</span>
+            <textarea id="detalhes" name="Detalhes específicos do público alvo" placeholder="Inserir texto"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. Anúncios -->
+      <section class="card" id="s4">
+        <div class="card-head">
+          <div class="step">04</div>
+          <h2>Informações sobre os anúncios</h2>
+          <p>Compartilhe informações sobre a sua experiência com publicidade online.</p>
+          <div class="err-msg">Preencha este campo.</div>
+        </div>
+        <div class="fields">
+          <div class="field full" data-required>
+            <label class="q" for="diferenciais">Quais são os principais benefícios e diferenciais do seu serviço que devem ser destacados?<span class="req">*</span></label>
+            <span class="hint">Ex.: Fixed-Price "No-Surprises", Extended Workmanship Warranty (beyond the 1 year legal minimum)</span>
+            <textarea id="diferenciais" name="Benefícios e diferenciais" placeholder="Inserir texto"></textarea>
+            <div class="err-msg">Preencha este campo.</div>
+          </div>
+          <div class="field full" data-required>
+            <span class="q">Você está disposto a aparecer nas mídias da empresa?<span class="req">*</span></span>
+            <div class="note">Obs.: Vídeos com o rosto do proprietário tendem a funcionar melhor e trazer mais clientes.</div>
+            <div class="choices" role="radiogroup">
+              <label><input type="radio" name="Disposto a aparecer nas mídias?" value="Sim"><span>Sim</span></label>
+              <label><input type="radio" name="Disposto a aparecer nas mídias?" value="Não"><span>Não</span></label>
+            </div>
+            <div class="err-msg">Selecione uma opção.</div>
+          </div>
+          <div class="field full" data-required>
+            <label class="q" for="investimento">Qual o investimento mensal que deverá ser usado nos anúncios?<span class="req">*</span></label>
+            <span class="hint">Ex.: $1,200, $2,000, etc.</span>
+            <div class="money"><span>$</span><input type="text" inputmode="numeric" id="investimento" name="Investimento mensal em anúncios" placeholder="Inserir moeda"></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="submit-bar">
+        <p class="saved" id="savedMsg"><i></i>Rascunho salvo automaticamente neste navegador</p>
+        <button type="submit" class="btn">
+          Enviar briefing
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <p class="send-error" id="sendError" role="alert" hidden>Não foi possível enviar agora. Verifique sua conexão e tente novamente. Suas respostas continuam salvas.</p>
+    </form>
+    </div>
+  </div>
+</main>
+
+<div class="success" id="successView" role="status">
+  <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+  <h2>Briefing recebido</h2>
+  <p>Obrigado por preencher. Nossa equipe vai analisar suas respostas e entrar em contato para os próximos passos.</p>
+  <div class="actions">
+    <button class="btn" id="downloadBtn" type="button">Baixar cópia em PDF</button>
+  </div>
+</div>
+
+<footer>
+  <img src="assets/logo-light.png" alt="FIXXA" width="2702" height="498"><br>
+  © <span id="year"></span> FIXXA Marketing
+</footer>
+
+<script>
+(function () {
+  const form = document.getElementById('briefing');
+  const KEY = 'fixxa-briefing-draft';
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const store = {
+    get() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } },
+    set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} },
+    clear() { try { localStorage.removeItem(KEY); } catch (e) {} }
+  };
+
+  // Files kept in memory per input (file inputs can't be restored from storage)
+  const fileState = new Map();
+
+  // Phone fields: country picker, US by default, formatted as (123) 456-7890
+  const phones = new Map();
+  form.querySelectorAll('input[type=tel]').forEach(el => {
+    el.placeholder = '(123) 456-7890';
+    phones.set(el, window.intlTelInput(el, {
+      initialCountry: 'us',
+      separateDialCode: true,
+      countryOrder: ['us', 'br'],
+      strictMode: true,
+      autoPlaceholder: 'off',
+      i18n: { searchPlaceholder: 'Buscar país', zeroSearchResults: 'Nenhum resultado' }
+    }));
+    el.addEventListener('input', () => formatNanp(el));
+    el.addEventListener('countrychange', () => { formatNanp(el); form.dispatchEvent(new Event('input')); });
+  });
+
+  // US/+1 numbers: force (123) 456-7890, keeping the caret after the same digit
+  function formatNanp(el) {
+    if (phones.get(el).getSelectedCountryData().dialCode !== '1') return;
+    const caretDigits = el.value.slice(0, el.selectionStart).replace(/\D/g, '').length;
+    const d = el.value.replace(/\D/g, '').slice(0, 10);
+    let v = d;
+    if (d.length > 6) v = '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+    else if (d.length > 3) v = '(' + d.slice(0, 3) + ') ' + d.slice(3);
+    else if (d.length) v = '(' + d;
+    el.value = v;
+    let pos = 0, seen = 0;
+    while (pos < v.length && seen < caretDigits) { if (/\d/.test(v[pos])) seen++; pos++; }
+    if (document.activeElement === el) el.setSelectionRange(pos, pos);
+  }
+  // Money fields: digits only, grouped as 1,200
+  function formatMoney(el) {
+    const caretDigits = el.value.slice(0, el.selectionStart).replace(/\D/g, '').length;
+    const d = el.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '');
+    const v = d.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    el.value = v;
+    let pos = 0, seen = 0;
+    while (pos < v.length && seen < caretDigits) { if (/\d/.test(v[pos])) seen++; pos++; }
+    if (document.activeElement === el) el.setSelectionRange(pos, pos);
+  }
+  form.querySelectorAll('.money input').forEach(el => {
+    el.addEventListener('beforeinput', e => {
+      if (e.data && /\D/.test(e.data) && e.inputType !== 'insertFromPaste') e.preventDefault();
+    });
+    el.addEventListener('paste', e => {
+      // "$3,000.50" -> "3000": drop cents, keep only digits
+      e.preventDefault();
+      const text = (e.clipboardData || window.clipboardData).getData('text');
+      const digits = text.trim().replace(/[.,]\d{1,2}\s*\D*$/, '').replace(/\D/g, '');
+      el.setRangeText(digits, el.selectionStart, el.selectionEnd, 'end');
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    el.addEventListener('input', () => formatMoney(el));
+  });
+
+  const phoneValue = el => {
+    const v = el.value.trim();
+    return v ? '+' + phones.get(el).getSelectedCountryData().dialCode + ' ' + v : '';
+  };
+
+  function collect() {
+    const data = {};
+    form.querySelectorAll('input[name], textarea[name]').forEach(el => {
+      if (phones.has(el)) {
+        data[el.name] = phoneValue(el);
+      } else if (el.type === 'file') {
+        data[el.name] = (fileState.get(el) || []).map(f => f.name);
+      } else if (el.type === 'radio') {
+        if (el.checked) data[el.name] = el.value;
+        else if (!(el.name in data)) data[el.name] = '';
+      } else {
+        data[el.name] = el.value.trim();
+      }
+    });
+    return data;
+  }
+
+  function restore() {
+    const saved = store.get();
+    form.querySelectorAll('input[name], textarea[name]').forEach(el => {
+      if (el.type === 'file' || !(el.name in saved)) return;
+      if (phones.has(el)) { phones.get(el).setNumber(saved[el.name]); formatNanp(el); }
+      else if (el.type === 'radio') el.checked = saved[el.name] === el.value;
+      else el.value = saved[el.name];
+    });
+  }
+
+  // Progress
+  const fieldEls = [...form.querySelectorAll('.field')];
+  const bar = document.getElementById('progressBar');
+  const pct = document.getElementById('progressPct');
+  function isFilled(field) {
+    const radios = field.querySelectorAll('input[type=radio]');
+    if (radios.length) return [...radios].some(r => r.checked);
+    const file = field.querySelector('input[type=file]');
+    if (file) return (fileState.get(file) || []).length > 0;
+    const el = field.querySelector('input[name], textarea[name]');
+    return el && el.value.trim() !== '';
+  }
+  function updateProgress() {
+    const filled = fieldEls.filter(isFilled).length;
+    const p = Math.round(filled / fieldEls.length * 100);
+    bar.style.width = p + '%';
+    pct.textContent = p + '%';
+    document.querySelectorAll('.nav-inner a').forEach(a => {
+      const sec = document.getElementById(a.dataset.sec);
+      const fs = [...sec.querySelectorAll('.field')];
+      a.classList.toggle('done', fs.every(isFilled));
+    });
+  }
+
+  let saveTimer;
+  form.addEventListener('input', e => {
+    const f = e.target.closest('.field');
+    if (f) f.classList.remove('error');
+    updateProgress();
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => store.set(collect()), 300);
+  });
+
+  // Dropzones
+  form.querySelectorAll('[data-drop]').forEach(zone => {
+    const input = zone.querySelector('input');
+    const list = zone.parentElement.querySelector('.file-list');
+    fileState.set(input, []);
+    const render = () => {
+      list.innerHTML = '';
+      fileState.get(input).forEach((f, i) => {
+        const li = document.createElement('li');
+        const name = document.createElement('span');
+        name.textContent = f.name;
+        const rm = document.createElement('button');
+        rm.type = 'button'; rm.setAttribute('aria-label', 'Remover ' + f.name); rm.textContent = '×';
+        rm.onclick = () => { fileState.get(input).splice(i, 1); render(); updateProgress(); };
+        li.append(name, rm);
+        list.appendChild(li);
+      });
+    };
+    input.addEventListener('change', () => {
+      fileState.set(input, fileState.get(input).concat([...input.files]));
+      input.value = '';
+      render(); updateProgress();
+    });
+    ['dragenter', 'dragover'].forEach(ev => zone.addEventListener(ev, () => zone.classList.add('over')));
+    ['dragleave', 'drop'].forEach(ev => zone.addEventListener(ev, () => zone.classList.remove('over')));
+  });
+
+  // Reveal on scroll + active nav
+  const cards = document.querySelectorAll('section.card');
+  const navLinks = document.querySelectorAll('.nav-inner a');
+  if ('IntersectionObserver' in window) {
+    const reveal = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) { en.target.classList.add('visible'); reveal.unobserve(en.target); }
+    }), { threshold: 0.08 });
+    cards.forEach(c => reveal.observe(c));
+    const spy = new IntersectionObserver(entries => entries.forEach(en => {
+      if (en.isIntersecting) navLinks.forEach(a => a.classList.toggle('active', a.dataset.sec === en.target.id));
+    }), { rootMargin: '-45% 0px -50% 0px' });
+    cards.forEach(c => spy.observe(c));
+  } else {
+    cards.forEach(c => c.classList.add('visible'));
+  }
+
+  // Validation + submit
+  const WEBHOOK_URL = 'https://hook.us1.make.com/ad3yee5l6djunp4hptjmnpycww9ap1qv';
+  const NOTIFY_EMAIL = 'nicolas@fixxamarketing.com.br';
+  const COMPANY_FIELD = 'Nome oficial da empresa (conforme registrado no IRS)';
+
+  // "Nível de Inglês" -> "nivel_de_ingles" (stable keys for the Make scenario)
+  const slug = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+  // Submitted value: money fields get their $ back
+  const submitted = (el, v) => (v && el.closest('.money') ? '$' + v : v);
+
+  // Question text as shown on the page, grouped by section, for the PDF
+  function answersBySection() {
+    const data = collect();
+    return [...form.querySelectorAll('section.card')].map(sec => ({
+      title: sec.querySelector('h2').textContent.trim(),
+      items: [...sec.querySelectorAll('.field')].map(f => {
+        const q = f.querySelector('.q');
+        const tip = q.querySelector('.tip');
+        let label = [...q.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim();
+        if (tip) label += ' (' + tip.textContent.trim() + ')';
+        const input = f.querySelector('input[name], textarea[name]');
+        const v = submitted(input, data[input.name]);
+        return { label, value: Array.isArray(v) ? v.join(', ') : v };
+      })
+    }));
+  }
+
+  let logoData = null;
+  function loadLogo() {
+    if (logoData) return Promise.resolve(logoData);
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        // 3x the printed width is plenty; keeps the PDF small
+        const c = document.createElement('canvas');
+        c.width = 330; c.height = Math.round(330 * img.naturalHeight / img.naturalWidth);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.drawImage(img, 0, 0, c.width, c.height);
+        try { logoData = { url: c.toDataURL('image/jpeg', 0.92), ratio: c.height / c.width }; } catch (e) {}
+        resolve(logoData);
+      };
+      img.onerror = () => resolve(null);
+      img.src = 'assets/logo-dark.png';
+    });
+  }
+
+  async function buildPdf(sentAt) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+    const M = 48, CW = W - M * 2;
+    const YELLOW = [240, 209, 0], DARK = [20, 20, 20], MUTED = [110, 110, 110], LINE = [225, 225, 225];
+    let y = 0;
+
+    const header = () => { doc.setFillColor(...YELLOW); doc.rect(0, 0, W, 6, 'F'); };
+    const newPage = () => { doc.addPage(); header(); y = M; };
+    const ensure = h => { if (y + h > H - M) newPage(); };
+
+    header();
+    y = M + 4;
+    const logo = await loadLogo();
+    if (logo) doc.addImage(logo.url, 'JPEG', M, y, 110, 110 * logo.ratio);
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(9); doc.setTextColor(...MUTED);
+    doc.text('Enviado em ' + sentAt.toLocaleString('pt-BR'), W - M, y + 14, { align: 'right' });
+    y += 60;
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(22); doc.setTextColor(...DARK);
+    doc.text('Briefing de Onboarding', M, y);
+    y += 22;
+    const company = collect()[COMPANY_FIELD];
+    if (company) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(12); doc.setTextColor(...MUTED);
+      doc.text(company, M, y); y += 10;
+    }
+    y += 18;
+
+    answersBySection().forEach((sec, si) => {
+      ensure(60);
+      doc.setFillColor(...YELLOW); doc.rect(M, y - 11, 3, 15, 'F');
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(13); doc.setTextColor(...DARK);
+      doc.text(String(si + 1).padStart(2, '0') + '  ' + sec.title, M + 12, y);
+      y += 22;
+      sec.items.forEach(it => {
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5);
+        const qLines = doc.splitTextToSize(it.label, CW);
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5);
+        const aLines = doc.splitTextToSize(it.value || '-', CW);
+        ensure(qLines.length * 12 + Math.min(aLines.length, 3) * 14 + 16);
+        doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(...MUTED);
+        doc.text(qLines, M, y); y += qLines.length * 12 + 3;
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(10.5); doc.setTextColor(...DARK);
+        aLines.forEach(line => { ensure(14); doc.text(line, M, y); y += 14; });
+        y += 6;
+        doc.setDrawColor(...LINE); doc.setLineWidth(0.5); doc.line(M, y, W - M, y);
+        y += 16;
+      });
+      y += 10;
+    });
+
+    const pages = doc.getNumberOfPages();
+    for (let i = 1; i <= pages; i++) {
+      doc.setPage(i);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(...MUTED);
+      doc.text('FIXXA Marketing  |  Briefing de Onboarding', M, H - 24);
+      doc.text(i + ' / ' + pages, W - M, H - 24, { align: 'right' });
+    }
+    return doc.output('blob');
+  }
+
+  const fileNameSafe = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-') || 'cliente';
+
+  let lastPdf = null, lastPdfName = '';
+  const submitBtn = form.querySelector('button[type=submit]');
+  const submitHtml = submitBtn.innerHTML;
+  const sendError = document.getElementById('sendError');
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (submitBtn.disabled) return;
+    let firstBad = null;
+    form.querySelectorAll('[data-required]').forEach(f => {
+      if (!isFilled(f)) { f.classList.add('error'); firstBad = firstBad || f; }
+    });
+    const email = document.getElementById('email_empresa');
+    email.closest('.field').querySelector('.err-msg').textContent = email.value.trim() ? 'Insira um e-mail válido.' : 'Preencha este campo.';
+    if (email.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+      email.closest('.field').classList.add('error'); firstBad = firstBad || email.closest('.field');
+    }
+    if (firstBad) {
+      firstBad.closest('section.card').classList.add('visible');
+      firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    sendError.hidden = true;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner" aria-hidden="true"></span>Enviando...';
+    try {
+      const sentAt = new Date();
+      const data = collect();
+      const pdf = await buildPdf(sentAt);
+      const pdfName = 'briefing-' + fileNameSafe(data[COMPANY_FIELD]) + '.pdf';
+
+      // One flat field per answer + the PDF + uploaded files, as multipart for Make
+      const body = new FormData();
+      body.append('enviado_em', sentAt.toISOString());
+      body.append('email_destino', NOTIFY_EMAIL);
+      body.append('empresa', data[COMPANY_FIELD] || '');
+      form.querySelectorAll('input[name], textarea[name]').forEach(el => {
+        if (el.type === 'file' || el.type === 'radio') return;
+        body.append(slug(el.name), submitted(el, data[el.name]));
+      });
+      form.querySelectorAll('.choices').forEach(group => {
+        const name = group.querySelector('input').name;
+        body.append(slug(name), data[name]);
+      });
+      body.append('pdf', pdf, pdfName);
+      form.querySelectorAll('input[type=file]').forEach(el => {
+        (fileState.get(el) || []).forEach((f, i) => body.append(slug(el.name) + '_' + (i + 1), f, f.name));
+      });
+
+      const res = await fetch(WEBHOOK_URL, { method: 'POST', body });
+      if (!res.ok) throw new Error('Webhook respondeu ' + res.status);
+
+      lastPdf = pdf; lastPdfName = pdfName;
+      store.clear();
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('successView').classList.add('show');
+      window.scrollTo({ top: 0 });
+    } catch (err) {
+      console.warn('Envio falhou:', err);
+      sendError.hidden = false;
+      sendError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = submitHtml;
+    }
+  });
+
+  document.getElementById('downloadBtn').addEventListener('click', () => {
+    if (!lastPdf) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(lastPdf);
+    a.download = lastPdfName;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+
+  restore();
+  updateProgress();
+})();
+</script>
+</body>
+</html>

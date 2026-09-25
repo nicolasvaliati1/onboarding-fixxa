@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/css/intlTelInput.min.css">
 <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@25.3.1/build/js/intlTelInputWithUtils.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png?v=2">
 <link rel="icon" type="image/png" sizes="512x512" href="assets/favicon-512.png?v=2">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=2">
@@ -988,9 +989,26 @@
         body.append(slug(name), data[name]);
       });
       body.append('pdf', pdf, pdfName);
-      form.querySelectorAll('input[type=file]').forEach(el => {
-        (fileState.get(el) || []).forEach((f, i) => body.append(slug(el.name) + '_' + (i + 1), f, f.name));
-      });
+      // One fixed key per upload field so Make can map it: a single file goes as-is,
+      // several files go together as one .zip
+      for (const el of form.querySelectorAll('input[type=file]')) {
+        const files = fileState.get(el) || [];
+        const key = slug(el.name);
+        if (files.length === 1) {
+          body.append(key, files[0], files[0].name);
+        } else if (files.length > 1) {
+          const zip = new JSZip();
+          const used = new Set();
+          files.forEach(f => {
+            let n = f.name, i = 2;
+            while (used.has(n)) n = f.name.replace(/(\.[^.]*)?$/, ' (' + i++ + ')$1');
+            used.add(n);
+            zip.file(n, f);
+          });
+          const blob = await zip.generateAsync({ type: 'blob' });
+          body.append(key, blob, key + '-' + fileNameSafe(data[COMPANY_FIELD]) + '.zip');
+        }
+      }
 
       const res = await fetch(WEBHOOK_URL, { method: 'POST', body });
       if (!res.ok) throw new Error('Webhook respondeu ' + res.status);

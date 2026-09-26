@@ -624,6 +624,8 @@
         </div>
       </section>
 
+      <!-- Honeypot: hidden from people, bots fill it and get rejected by api/submit.js -->
+      <input type="text" id="hpWebsite" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
       <div class="submit-bar">
         <p class="saved" id="savedMsg"><i></i>Rascunho salvo automaticamente neste navegador</p>
         <button type="submit" class="btn">
@@ -830,7 +832,10 @@
   }
 
   // Validation + submit
-  const WEBHOOK_URL = 'https://hook.us1.make.com/ad3yee5l6djunp4hptjmnpycww9ap1qv';
+  // Our Vercel function forwards to Make and emails a backup copy (api/submit.js)
+  const SUBMIT_URL = '/api/submit';
+  // Vercel rejects request bodies over 4.5 MB
+  const MAX_BODY = 4.3 * 1024 * 1024;
   const NOTIFY_EMAIL = 'nicolas@fixxamarketing.com.br';
   const COMPANY_FIELD = 'Nome oficial da empresa (conforme registrado no IRS)';
 
@@ -947,6 +952,7 @@
   const submitBtn = form.querySelector('button[type=submit]');
   const submitHtml = submitBtn.innerHTML;
   const sendError = document.getElementById('sendError');
+  const sendErrorText = sendError.textContent;
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
@@ -1010,8 +1016,20 @@
         }
       }
 
-      const res = await fetch(WEBHOOK_URL, { method: 'POST', body });
-      if (!res.ok) throw new Error('Webhook respondeu ' + res.status);
+      body.append('website', document.getElementById('hpWebsite').value);
+
+      let size = 0;
+      for (const [, v] of body.entries()) size += typeof v === 'string' ? v.length : v.size;
+      if (size > MAX_BODY) {
+        sendError.textContent = 'Os arquivos anexados somam ' + (size / 1048576).toFixed(1) +
+          ' MB, acima do limite de 4 MB. Remova ou reduza alguns arquivos e tente novamente.';
+        sendError.hidden = false;
+        sendError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const res = await fetch(SUBMIT_URL, { method: 'POST', body });
+      if (!res.ok) throw new Error('Envio respondeu ' + res.status);
 
       lastPdf = pdf; lastPdfName = pdfName;
       store.clear();
@@ -1020,6 +1038,7 @@
       window.scrollTo({ top: 0 });
     } catch (err) {
       console.warn('Envio falhou:', err);
+      sendError.textContent = sendErrorText;
       sendError.hidden = false;
       sendError.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } finally {
